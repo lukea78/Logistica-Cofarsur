@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Logística Cofarsur Rio Cuarto</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="header-container">
+        <!-- Agregando la imagen del logo con el nuevo nombre sugerido -->
+        <img src="logo.png" alt="Cofarsur Logo" class="logo">
+        <h1>Dashboard Logística Cofarsur Rio Cuarto</h1>
+        
+        <!-- Input para cargar archivo Excel -->
+        <div class="file-upload">
+            <label for="file-input">Selecciona el archivo Excel:</label>
+            <input type="file" id="file-input" accept=".xlsx" />
+        </div>
+    </div>
+
+    <!-- Título para la sección de gráficos y mes -->
+    <h3>GRÁFICOS Y MESES</h3>
+    
+    <!-- Contenedor para los filtros -->
+    <div class="filter-container">
+        <!-- Selección de tipo de gráfico -->
+        <select id="chart-type">
+            <option value="bar">Barras</option>
+            <option value="line">Líneas</option>
+            <option value="pie">Pastel</option>
+            <option value="doughnut">Doughnut</option>
+        </select>
+
+        <!-- Filtro de Mes -->
+        <select id="filtro-mes" onchange="filtrarMosaicos()">
+            <option value="">Todos</option>
+            <option value="ene">ENE</option>
+            <option value="feb">FEB</option>
+            <option value="mar">MAR</option>
+            <option value="abr">ABR</option>
+            <option value="may">MAY</option>
+            <option value="jun">JUN</option>
+            <option value="jul">JUL</option>
+            <option value="ago">AGO</option>
+            <option value="sept">SEPT</option>
+            <option value="oct">OCT</option>
+            <option value="nov">NOV</option>
+            <option value="dic">DIC</option>
+        </select>
+    </div>
+
+    <!-- Título de Totales Mensuales -->
+    <h2>Totales Mensuales</h2>
+    <div id="mosaicos-container" class="mosaicos-container">
+        <div class="mosaico" id="mosaico-unidadesRecibidas">
+            <div class="mosaico-titulo">Unidades Recibidas</div>
+            <div class="mosaico-valor" id="valor-unidadesRecibidas">0</div>
+        </div>
+        <div class="mosaico" id="mosaico-unidadesGuardadas">
+            <div class="mosaico-titulo">Unidades Guardadas</div>
+            <div class="mosaico-valor" id="valor-unidadesGuardadas">0</div>
+        </div>
+        <div class="mosaico" id="mosaico-unidadesRepuestas">
+            <div class="mosaico-titulo">Unidades Repuestas</div>
+            <div class="mosaico-valor" id="valor-unidadesRepuestas">0</div>
+        </div>
+        <div class="mosaico" id="mosaico-unidadesPreparadas">
+            <div class="mosaico-titulo">Unidades Preparadas</div>
+            <div class="mosaico-valor" id="valor-unidadesPreparadas">0</div>
+        </div>
+        <div class="mosaico" id="mosaico-creditosOperativos">
+            <div class="mosaico-titulo">Créditos Operativos</div>
+            <div class="mosaico-valor" id="valor-creditosOperativos">0</div>
+        </div>
+        <div class="mosaico" id="mosaico-incidenciaCreditos">
+            <div class="mosaico-titulo">Incidencia Créditos</div>
+            <div class="mosaico-valor" id="valor-incidenciaCreditos">0%</div>
+        </div>
+        <div class="mosaico" id="mosaico-porcentajeReclamos">
+            <div class="mosaico-titulo">Porcentaje de Reclamos</div>
+            <div class="mosaico-valor" id="valor-porcentajeReclamos">0%</div>
+        </div>
+        <div class="mosaico" id="mosaico-montoRotura">
+            <div class="mosaico-titulo">Monto de Rotura</div>
+            <div class="mosaico-valor" id="valor-montoRotura">$0.00</div>
+        </div>
+        <div class="mosaico" id="mosaico-montoVencido">
+            <div class="mosaico-titulo">Monto Vencido</div>
+            <div class="mosaico-valor" id="valor-montoVencido">$0.00</div>
+        </div>
+        <div class="mosaico" id="mosaico-productividad">
+            <div class="mosaico-titulo">Productividad</div>
+            <div class="mosaico-valor" id="valor-productividad">0</div>
+        </div>
+        <div class="mosaico" id="mosaico-costosLogisticos">
+            <div class="mosaico-titulo">Costos Logísticos</div>
+            <div class="mosaico-valor" id="valor-costosLogisticos">0%</div>
+        </div>
+        <div class="mosaico" id="mosaico-kilometrosTotales">
+            <div class="mosaico-titulo">Km Logísticos</div>
+            <div class="mosaico-valor" id="valor-kilometrosTotales">0</div>
+        </div>
+    </div>
+
+    <!-- Sección: Volumen de Operación -->
+    <h2>Volumen de Operación</h2>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="unidadesRecibidas"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="unidadesGuardadas"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="unidadesRepuestas"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="unidadesPreparadas"></canvas>
+        </div>
+    </div>
+
+    <!-- Sección: Servicio -->
+    <h2>Servicio</h2>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="creditosOperativos"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="incidenciaCreditos"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="porcentajeReclamos"></canvas>
+        </div>
+    </div>
+
+    <!-- Sección: Administración de Stock -->
+    <h2>Administración de Stock</h2>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="montoRotura"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="montoVencido"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="unidadesVencidas"></canvas>
+        </div>
+    </div>
+
+    <!-- Sección: RRHH -->
+    <h2>RRHH</h2>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="horasTrabajadas"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="ausentismo"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="unidadesProducidas"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="productividad"></canvas>
+        </div>
+    </div>
+
+    <!-- Sección: Costos Logísticos -->
+    <h2>Costos Logísticos</h2>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="costosLogisticos"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="ventasMes"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="pagosTransportes"></canvas>
+        </div>
+    </div>
+
+    <!-- Sección: Kilómetros Totales -->
+    <h2>Kilómetros Totales</h2>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="kilometrosTotales"></canvas>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
